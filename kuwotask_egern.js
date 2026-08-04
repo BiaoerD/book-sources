@@ -977,7 +977,11 @@ function sec(t, e) {
 }
 function Env(name) {
     const isLoon = typeof $loon !== "undefined";
-    const isEgern = typeof $environment !== "undefined" && $environment.app && $environment.app.indexOf("Egern") >= 0;
+    const isEgern = typeof $environment !== "undefined" && $environment !== null && (
+        ($environment.app && String($environment.app).indexOf("Egern") >= 0) ||
+        ($environment.appName && String($environment.appName).indexOf("Egern") >= 0) ||
+        (typeof $environment === "string" && $environment.indexOf("Egern") >= 0)
+    );
     const isQX = typeof $task !== "undefined";
     // Egern 使用 $httpClient（同 Surge），不排除 Egern
     const isSurge = typeof $httpClient !== "undefined" && !isLoon && !isQX;
