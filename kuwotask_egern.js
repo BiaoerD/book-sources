@@ -437,9 +437,10 @@ button { width: 100%; padding: 14px; margin-top: 8px; border: none; border-radiu
     });
 })();
 </script></body></html>`;
-    if ($.isQX || $.isEgern) {
+    if ($.isQX) {
         $.done({ status: "HTTP/1.1 200 OK", headers: { "Content-Type": "text/html;charset=utf-8" }, body: h });
     } else {
+        // Surge, Loon, Egern
         $.done({ response: { status: 200, headers: { "Content-Type": "text/html;charset=utf-8" }, body: h } });
     }
 }
@@ -919,17 +920,11 @@ function ret(d) {
     let h = { "Content-Type": "application/json; charset=utf-8", "Access-Control-Allow-Origin": "*" }; 
     let b = JSON.stringify(d);
     $.log(`[ret] 返回数据: ${b.substring(0, 200)}`);
-    if ($.isQX || $.isEgern) {
+    if ($.isQX) {
         $done({ status: "HTTP/1.1 200 OK", headers: h, body: b });
     } else {
-        // Surge & Loon
-        $done({ 
-            response: { 
-                status: 200, 
-                headers: h, 
-                body: b 
-            } 
-        });
+        // Surge, Loon, Egern
+        $done({ response: { status: 200, headers: h, body: b } });
     }
 }
 // 生成UUID
@@ -984,25 +979,27 @@ function Env(name) {
     const isLoon = typeof $loon !== "undefined";
     const isEgern = typeof $environment !== "undefined" && $environment.app && $environment.app.indexOf("Egern") >= 0;
     const isQX = typeof $task !== "undefined";
-    // Egern 使用 $httpClient（同 Surge），所以不开 isQX 路径
-    const isSurge = typeof $httpClient !== "undefined" && !isLoon && !isQX && !isEgern;
+    // Egern 使用 $httpClient（同 Surge），不排除 Egern
+    const isSurge = typeof $httpClient !== "undefined" && !isLoon && !isQX;
     const http = { get: o => send(o, 'GET'), post: o => send(o, 'POST') };
     const send = (o, m) => new Promise((r, j) => { 
-        // Egern 也用 $httpClient（同 Surge），所以不走 isQX 的 $task.fetch
-        const opt = { url: o.url, headers: o.headers }; 
-        if (o.body) opt.body = o.body;
-        try {
-            const c = m === 'POST' ? $httpClient.post : $httpClient.get; 
-            c(opt, (e, res, b) => { 
-                if (e) j(e); 
-                else { 
-                    // Egern 的 response 可能有 body 属性，也可能通过第三个参数传
-                    if (b !== undefined) res.body = b; 
-                    r(res) 
-                } 
-            });
-        } catch (e) {
-            j(e);
+        const opt = isQX ? o : { url: o.url, headers: o.headers, body: o.body };
+        if (isQX) {
+            opt.method = m;
+            $task.fetch(opt).then(res => { res.body = res.body; r(res) }).catch(j);
+        } else {
+            try {
+                const c = m === 'POST' ? $httpClient.post : $httpClient.get;
+                c(opt, (e, res, b) => {
+                    if (e) j(e);
+                    else {
+                        if (b !== undefined) res.body = b;
+                        r(res);
+                    }
+                });
+            } catch (e) {
+                j(e);
+            }
         }
     });
     const setdata = (v, k) => { if (isQX) return $prefs.setValueForKey(v, k); return $persistentStore.write(v, k) };
