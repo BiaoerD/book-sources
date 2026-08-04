@@ -4,7 +4,7 @@
 #!homepage = https://github.com/Yu9191/Rewrite
 
 [Script]
-http-request = ^https?://360\.com/kuwo, script-http-request, https://raw.githubusercontent.com/BiaoerD/book-sources/main/kuwotask_egern.js
+# 酷我音乐签到 = type=http-request,pattern=^https?://360\.com/kuwo,requires-body=0,max-size=0,timeout=20,script-path=https://raw.githubusercontent.com/BiaoerD/book-sources/main/kuwotask_egern.js
 
 [MITM]
-hostname = *.kuwo.cn, 360.com
+hostname = %APPEND% *.kuwo.cn, 360.com
