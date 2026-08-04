@@ -437,10 +437,10 @@ button { width: 100%; padding: 14px; margin-top: 8px; border: none; border-radiu
     });
 })();
 </script></body></html>`;
-    if ($.isQX) {
-        $.done({ status: "HTTP/1.1 200 OK", headers: { "Content-Type": "text/html;charset=utf-8" }, body: h });
+    if ($.isQX || $.isEgern) {
+        $.done({ status: 200, headers: { "Content-Type": "text/html;charset=utf-8", "Access-Control-Allow-Origin": "*" }, body: h });
     } else {
-        // Surge, Loon, Egern
+        // Surge, Loon
         $.done({ response: { status: 200, headers: { "Content-Type": "text/html;charset=utf-8" }, body: h } });
     }
 }
@@ -920,10 +920,10 @@ function ret(d) {
     let h = { "Content-Type": "application/json; charset=utf-8", "Access-Control-Allow-Origin": "*" }; 
     let b = JSON.stringify(d);
     $.log(`[ret] 返回数据: ${b.substring(0, 200)}`);
-    if ($.isQX) {
-        $done({ status: "HTTP/1.1 200 OK", headers: h, body: b });
+    if ($.isQX || $.isEgern) {
+        $done({ status: 200, headers: h, body: b });
     } else {
-        // Surge, Loon, Egern
+        // Surge, Loon
         $done({ response: { status: 200, headers: h, body: b } });
     }
 }
