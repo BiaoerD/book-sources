@@ -4,7 +4,7 @@
 #!homepage = https://github.com/Yu9191/Rewrite
 
 [Script]
-http-request = ^https?:\/\/360\.com\/kuwo, script-http-request, https://raw.githubusercontent.com/BiaoerD/book-sources/main/kuwotask_egern.js
+http-request = ^https?://360\.com/kuwo, script-http-request, https://raw.githubusercontent.com/BiaoerD/book-sources/main/kuwotask_egern.js
 
 [MITM]
 hostname = *.kuwo.cn, 360.com
